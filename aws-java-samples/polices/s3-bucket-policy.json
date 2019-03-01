@@ -1,0 +1,25 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Deny",
+            "Principal": "*",
+            "Action": "s3:*",
+            "Resource": [
+                "arn:aws:s3:::tasadora-alpha",
+                "arn:aws:s3:::tasadora-alpha/*"
+            ],
+            "Condition": {
+                "StringNotLike": {
+                    "aws:userid": [
+                        "AROAJLRYNATR3JJVMKT5U:*",
+                        "AROAJJTHAY4RCVZGRWJV6:*",
+                        "AIDAJWCNOYHLLPAYQPXLA",
+                        "AIDAJB733T77GWHFS3SBI",
+                        "933272457605"
+                    ]
+                }
+            }
+        }
+    ]
+}

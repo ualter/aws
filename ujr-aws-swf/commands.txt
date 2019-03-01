@@ -1,0 +1,15 @@
+
+## CLASSPATH TO RUN through Shell
+export CLASSPATH='target/ujr-aws-swf-1.0.jar:/Users/ualter/.m2/repository/com/amazonaws/aws-java-sdk-simpleworkflow/1.11.245/aws-java-sdk-simpleworkflow-1.11.245.jar:/Users/ualter/.m2/repository/com/amazonaws/aws-java-sdk-core/1.11.455/aws-java-sdk-core-1.11.455.jar:/Users/ualter/.m2/repository/commons-logging/commons-logging/1.1.3/commons-logging-1.1.3.jar:/Users/ualter/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.9.6/jackson-databind-2.9.6.jar:/Users/ualter/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.9.6/jackson-core-2.9.6.jar:/Users/ualter/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.9.0/jackson-annotations-2.9.0.jar:/Users/ualter/.m2/repository/org/apache/httpcomponents/httpcore/4.4.9/httpcore-4.4.9.jar:/Users/ualter/.m2/repository/org/apache/httpcomponents/httpclient/4.5.5/httpclient-4.5.5.jar:/Users/ualter/.m2/repository/joda-time/joda-time/2.10.1/joda-time-2.10.1.jar'
+
+## then... Register the Workflow Types
+java com.amazonaws.samples.ujr.aws.swf.hello.HelloTypes
+
+## Polling for Activities
+java com.amazonaws.samples.ujr.aws.swf.hello.ActivityWorker
+
+## Polling for Deciders
+java com.amazonaws.samples.ujr.aws.swf.hello.WorkflowWorker
+
+## Start Workflow
+java com.amazonaws.samples.ujr.aws.swf.hello.WorkflowWorker

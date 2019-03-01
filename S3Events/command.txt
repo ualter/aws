@@ -1,0 +1,18 @@
+
+
+
+### Apache
+/etc/apache2$ sudo apachectl start
+/etc/apache2$sudo apachectl restart
+/private/var/log/apache2$ tail -f forensic_log
+/private/var/log/apache2$ clear & tail -f error_log
+/etc/apache2$ cat extra/httpd-vhosts.conf 
+
+### Find AWSSigner 
+~/Developer/aws/aws-sdk-java/aws-java-sdk-core/target/classes$ find . -name "*AWS4Signer.class" | xargs ls -l
+
+### Check AWSSigner
+~/Developer/aws/aws-sdk-java/aws-java-sdk-core/target/classes$ jar -tvf /Users/ualter/.m2/repository/com/amazonaws/aws-java-sdk-core/1.11.454/aws-java-sdk-core-1.11.454.jar | grep AWS4Signer.class
+
+### Update AWSSigner
+~/Developer/aws/aws-sdk-java/aws-java-sdk-core/target/classes$ jar uf /Users/ualter/.m2/repository/com/amazonaws/aws-java-sdk-core/1.11.454/aws-java-sdk-core-1.11.454.jar com/amazonaws/auth/AWS4Signer.class
