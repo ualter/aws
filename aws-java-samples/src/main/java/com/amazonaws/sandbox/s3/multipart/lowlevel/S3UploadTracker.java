@@ -2,6 +2,7 @@ package com.amazonaws.sandbox.s3.multipart.lowlevel;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -21,9 +22,15 @@ public class S3UploadTracker {
 	private long   filePosition;
 	private List<PartSaved> listPartSaved = new ArrayList<PartSaved>();
 	private boolean finalizedSuccessfully;
+	private String pathFiles = "/Users/ualter/Temp/";
+	private String folder;
+	private int sequence;
+	private boolean setUp;
+	
+	private static DecimalFormat DF = new DecimalFormat("#00");
 	
 	public static void main(String[] args) {
-		S3UploadTracker s3UploadTracker = new S3UploadTracker("teste","file");
+		S3UploadTracker s3UploadTracker = new S3UploadTracker("bucketName","keyName");
 		s3UploadTracker.setFilePosition(12390);
 		s3UploadTracker.setPartSize(10);
 		s3UploadTracker.setUploadId("fdsjfklsjdlkfjsdl");
@@ -47,20 +54,39 @@ public class S3UploadTracker {
 	}
 
 	public String printSnapShot() {
-		SimpleDateFormat sdf            = new SimpleDateFormat("yyyyddmm_hhMMss");
-		String           resultFileName = "/Users/ualter/Temp/S3UploadTracker-" + sdf.format(Calendar.getInstance().getTime());
-		if ( this.isFinalizedSuccessfully() ) { 
-			resultFileName += ".txt";
-		} else {
-			resultFileName += "-finalized.txt";
+		if ( !this.setUp ) {
+			setUpS3UploadTracker();
 		}
-		ObjectMapper     mapper         = new ObjectMapper();
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyddmm_hhMMss");
+		
+		String resultFileName = this.folder 
+				+ DF.format(++sequence)
+				+ "-"
+				+ this.key.replaceAll("/", "_") 
+				+ "-" 
+				+ sdf.format(Calendar.getInstance().getTime());
+		
+		if ( this.isFinalizedSuccessfully() ) {
+			resultFileName += "-finalized.txt";
+		} else {
+			resultFileName += ".txt";
+		}
+		ObjectMapper mapper = new ObjectMapper();
 		try {
 			mapper.writeValue(new File(resultFileName), this);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 		return resultFileName;
+	}
+
+	private void setUpS3UploadTracker() {
+		this.folder = pathFiles + this.key.replaceAll("/", "_") + "/";
+		File fDir = new File(this.folder);
+		
+		fDir.mkdir();
+		this.setUp = true;
 	}
 	
 	public static S3UploadTracker loadMe(String fromWhere) {

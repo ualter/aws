@@ -15,6 +15,7 @@ import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.PropertiesFileCredentialsProvider;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
+import com.amazonaws.event.ProgressListener;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.retry.PredefinedRetryPolicies;
 import com.amazonaws.sandbox.iam.IAMSandbox;
@@ -55,10 +56,10 @@ public class S3ResumeLowLevelSendMultiPartFile {
 		
 		String bucket            = "tasadora-test";
         String key               = "request/tasacion-file-multipartedUploaded.pdf";
-		String uploadId          = "Doy.yiSXWEQkvvv2ZuUx7p3mcMod6bVQUjLrqFeQif8Q6XJYWwJZpHwre8tma.e8uN3_V0K_mrVXjf80EHMbuTbcwjnetdQR0nPHQAfYdWg7zHvyj.eE9cN3BxfajNpl";
+		String uploadId          = "IAxz_FRe7MAh1mmTDJ__Re4z2VFmyxcQ2FjKFr3kYa3kPZCP6goMF7jpA40iAfznvTotQKgBoa.wojPWb0CbeDQpQIeeWQNCxYT4py2JI3UpJvxl2fZBxzcPMGn2cBCE";
 		String file              = "/Users/ualter/Temp/529-2712-1-PB.pdf";
 		int    partSize          = 10;
-		long   startFilePosition = 41943040 + (partSize * 1024 * 1024);
+		long   startFilePosition = 31457280 + (partSize * 1024 * 1024);
 		
 		List<PartETag> partETags = new ArrayList<PartETag>();
 		partETags.add(new PartETag(1, "3beb7e9af8674013a48d78ba14b4b075"));
@@ -84,6 +85,7 @@ public class S3ResumeLowLevelSendMultiPartFile {
 	static Semaphore SEMAPHORE  = new Semaphore(THREAD_POOL_SIZE);
 	
 	S3UploadTracker s3UploadTracker = new S3UploadTracker();
+	S3LowLevelProgressListener progressListener = new S3LowLevelProgressListener();
 	
 	private void multipartResumeUploadsFile(String bucket, String key, 
 			String uploadId, String fileName, List<PartETag> parETagsAlreadyUploaded,
@@ -155,7 +157,8 @@ public class S3ResumeLowLevelSendMultiPartFile {
             	SEMAPHORE.acquire();
             	System.out.println("Got the permit!");
             	
-                uploadRequest = new UploadRequest(bucket, key, file, s3, partSize, filePosition, i, partETags, initResponse, this.s3UploadTracker);
+                uploadRequest = new UploadRequest(bucket, key, file, s3, partSize, filePosition, i, partETags, initResponse, 
+                		this.s3UploadTracker, this.progressListener);
                 Thread t = new Thread(uploadRequest);
                 t.setName("***** Upload-" + i);
                 t.setDaemon(true); 
@@ -200,10 +203,11 @@ public class S3ResumeLowLevelSendMultiPartFile {
 		private List<PartETag> partETags;
 		private InitiateMultipartUploadResult initResponse;
 		private S3UploadTracker s3UploadTracker;
+		private ProgressListener progressListener;
 		
 		public UploadRequest(String bucket, String key, File file, AmazonS3 s3, long partSize, long filePosition, 
 				int sequence, List<PartETag> partETags,
-				InitiateMultipartUploadResult initResponse, S3UploadTracker s3UploadTracker) {
+				InitiateMultipartUploadResult initResponse, S3UploadTracker s3UploadTracker, ProgressListener progressListener) {
 			super();
 			this.bucket = bucket;
 			this.key = key;
@@ -215,6 +219,7 @@ public class S3ResumeLowLevelSendMultiPartFile {
 			this.partETags = partETags;
 			this.initResponse = initResponse;
 			this.s3UploadTracker = s3UploadTracker;
+			this.progressListener = progressListener;
 		}
 
 
@@ -231,6 +236,8 @@ public class S3ResumeLowLevelSendMultiPartFile {
 			        .withFileOffset(filePosition)
 			        .withFile(file)
 			        .withPartSize(partSize);
+			
+			uploadRequest.setGeneralProgressListener(this.progressListener);
 			
 			// Upload the part and add the response's ETag to our list.
 			UploadPartResult uploadResult = s3.uploadPart(uploadRequest);

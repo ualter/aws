@@ -15,7 +15,6 @@ import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.PropertiesFileCredentialsProvider;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
-import com.amazonaws.event.ProgressEvent;
 import com.amazonaws.event.ProgressListener;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.retry.PredefinedRetryPolicies;
@@ -49,6 +48,7 @@ public class S3LowLevelSendMultiPartFile {
     static Semaphore SEMAPHORE  = new Semaphore(THREAD_POOL_SIZE);
     
     S3UploadTracker s3UploadTracker = new S3UploadTracker();
+    S3LowLevelProgressListener progressListener = new S3LowLevelProgressListener();
 	
 	private void multipartUploadsFile() {
         try {
@@ -132,7 +132,8 @@ public class S3LowLevelSendMultiPartFile {
             	SEMAPHORE.acquire();
             	System.out.println("Got the permit!");
             	
-                uploadRequest = new UploadRequest(bucket, key, file, s3, partSize, filePosition, i, partETags, initResponse, this.s3UploadTracker);
+                uploadRequest = new UploadRequest(bucket, key, file, s3, partSize, filePosition, i, partETags, initResponse,
+                		this.s3UploadTracker, this.progressListener);
                 Thread t = new Thread(uploadRequest);
                 t.setName("***** Upload-" + i);
                 t.setDaemon(true);
@@ -254,10 +255,11 @@ public class S3LowLevelSendMultiPartFile {
 		private List<PartETag> partETags;
 		private InitiateMultipartUploadResult initResponse;
 		private S3UploadTracker s3UploadTracker;
+		private ProgressListener progressListener;
 		
 		public UploadRequest(String bucket, String key, File file, AmazonS3 s3, long partSize, long filePosition, 
 				int sequence, List<PartETag> partETags,
-				InitiateMultipartUploadResult initResponse, S3UploadTracker s3UploadTracker) {
+				InitiateMultipartUploadResult initResponse, S3UploadTracker s3UploadTracker, ProgressListener progressListener) {
 			super();
 			this.bucket = bucket;
 			this.key = key;
@@ -269,6 +271,7 @@ public class S3LowLevelSendMultiPartFile {
 			this.partETags = partETags;
 			this.initResponse = initResponse;
 			this.s3UploadTracker = s3UploadTracker;
+			this.progressListener = progressListener;
 		}
 
 
@@ -287,14 +290,7 @@ public class S3LowLevelSendMultiPartFile {
 			        .withPartSize(partSize);
 			
 			
-			ProgressListener  progressListener = new ProgressListener() {
-				@Override
-				public void progressChanged(ProgressEvent progressEvent) {
-					//progressEvent.getEventType()
-				}
-			};
-			uploadRequest.withGeneralProgressListener(progressListener);
-			
+			uploadRequest.setGeneralProgressListener(this.progressListener);
 			
 			// Upload the part and add the response's ETag to our list.
 			UploadPartResult uploadResult = s3.uploadPart(uploadRequest);
