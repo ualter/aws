@@ -13,10 +13,11 @@ import java.util.concurrent.Executors;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.ClientConfiguration;
+import com.amazonaws.Protocol;
 import com.amazonaws.auth.PropertiesFileCredentialsProvider;
 import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.client.builder.ExecutorFactory;
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
+import com.amazonaws.client.builder.ExecutorFactory;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.retry.PredefinedRetryPolicies;
 import com.amazonaws.sandbox.iam.IAMSandbox;
@@ -55,6 +56,7 @@ public class S3SendMultiPartFile {
     		
     		ClientConfiguration clientConfiguration=new ClientConfiguration();
     		clientConfiguration.setMaxConnections(THREAD_POOL_SIZE);
+    		clientConfiguration.setProtocol(Protocol.HTTP);
     		// Change the default setting of 3 retry attempts to 5
     		clientConfiguration.setRetryPolicy(PredefinedRetryPolicies.getDefaultRetryPolicyWithCustomMaxRetries(5));
     		

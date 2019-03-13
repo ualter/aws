@@ -26,18 +26,19 @@ import java.util.UUID;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
-import com.amazonaws.auth.BasicSessionCredentials;
+import com.amazonaws.ClientConfiguration;
+import com.amazonaws.Protocol;
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.Bucket;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 /**
  * This sample demonstrates how to make basic requests to Amazon S3 using
@@ -62,10 +63,21 @@ public class S3Sample {
          * aws_access_key_id = YOUR_ACCESS_KEY_ID
          * aws_secret_access_key = YOUR_SECRET_ACCESS_KEY
          */
+    	
+    	ClientConfiguration clientCfg = new ClientConfiguration();
+	    clientCfg.setProtocol(Protocol.HTTP);
+	    
+    	
+    	EndpointConfiguration endpointConfiguration =
+    			new AwsClientBuilder.EndpointConfiguration("http://bancsabadells3.us-west-2.amazonaws.com","us-west-2");
 
-        AmazonS3 s3 = new AmazonS3Client();
-        Region usWest2 = Region.getRegion(Regions.US_WEST_2);
-        s3.setRegion(usWest2);
+        AmazonS3 s3 = AmazonS3ClientBuilder.standard()
+        			  .withEndpointConfiguration(endpointConfiguration)
+        			  .withClientConfiguration(clientCfg)
+        			  .enablePathStyleAccess()
+        			  .build();
+        //Region usWest2 = Region.getRegion(Regions.US_WEST_2);
+        //s3.setRegion(usWest2);
 
         String bucketName = "my-first-s3-bucket-" + UUID.randomUUID();
         String key = "MyObjectKey";

@@ -1,34 +1,19 @@
 package com.amazonaws.sandbox.s3.multipart.lowlevel;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
-import com.amazonaws.ClientConfiguration;
-import com.amazonaws.auth.PropertiesFileCredentialsProvider;
-import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
 import com.amazonaws.event.ProgressListener;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.retry.PredefinedRetryPolicies;
-import com.amazonaws.sandbox.iam.IAMSandbox;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.CompleteMultipartUploadRequest;
 import com.amazonaws.services.s3.model.CompleteMultipartUploadResult;
 import com.amazonaws.services.s3.model.InitiateMultipartUploadRequest;
 import com.amazonaws.services.s3.model.InitiateMultipartUploadResult;
-import com.amazonaws.services.s3.model.ObjectTagging;
 import com.amazonaws.services.s3.model.PartETag;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.Tag;
 import com.amazonaws.services.s3.model.UploadPartRequest;
 import com.amazonaws.services.s3.model.UploadPartResult;
 
@@ -59,7 +44,7 @@ public class S3ResumeLowLevelSendMultiPartFile {
 		String uploadId          = "IAxz_FRe7MAh1mmTDJ__Re4z2VFmyxcQ2FjKFr3kYa3kPZCP6goMF7jpA40iAfznvTotQKgBoa.wojPWb0CbeDQpQIeeWQNCxYT4py2JI3UpJvxl2fZBxzcPMGn2cBCE";
 		String file              = "/Users/ualter/Temp/529-2712-1-PB.pdf";
 		int    partSize          = 10;
-		long   startFilePosition = 31457280 + (partSize * 1024 * 1024);
+		long   startFilePosition = 31457280 + (partSize * 1024 * 1024); // Add the part already uploaded with the Last Thread (filePosition + partSize)
 		
 		List<PartETag> partETags = new ArrayList<PartETag>();
 		partETags.add(new PartETag(1, "3beb7e9af8674013a48d78ba14b4b075"));
@@ -68,6 +53,8 @@ public class S3ResumeLowLevelSendMultiPartFile {
 		partETags.add(new PartETag(4, "f31091770d8053754a02715dca601fa3"));
 		partETags.add(new PartETag(5, "f31aa43f51fba0f8991eb3971a9c55b0"));
 		
+		boolean incremental             = true;
+		boolean finalizeMutilPartUpload = true;
 		
 		S3ResumeLowLevelSendMultiPartFile s3ResumeUpload = new S3ResumeLowLevelSendMultiPartFile();
 		s3ResumeUpload.multipartResumeUploadsFile(
@@ -78,7 +65,8 @@ public class S3ResumeLowLevelSendMultiPartFile {
 				partETags,
 				6,
 				startFilePosition,
-				partSize);
+				partSize,
+				incremental, finalizeMutilPartUpload);
 	}
 
 	static int THREAD_POOL_SIZE = 5;
@@ -89,7 +77,7 @@ public class S3ResumeLowLevelSendMultiPartFile {
 	
 	private void multipartResumeUploadsFile(String bucket, String key, 
 			String uploadId, String fileName, List<PartETag> parETagsAlreadyUploaded,
-			int startSequence, long startFilePosition, int partSizeMB) {
+			int startSequence, long startFilePosition, int partSizeMB, boolean incremental, boolean finalizeMutilPartUpload) {
 		
 		s3UploadTracker.setBucketName(bucket);
     	s3UploadTracker.setKey(key);
@@ -102,24 +90,7 @@ public class S3ResumeLowLevelSendMultiPartFile {
         	
         	TimeTracker timeTracker = TimeTracker.getInstance();
         	
-        	File credentialsFilePath = new File(IAMSandbox.class.getClassLoader().getResource("tasadora-test-credentials.properties").getFile());
-    		PropertiesFileCredentialsProvider propertiesFileCredentialsProvider = new PropertiesFileCredentialsProvider(credentialsFilePath.getPath());
-    		
-    		ClientConfiguration clientConfiguration=new ClientConfiguration();
-    		clientConfiguration.setMaxConnections(THREAD_POOL_SIZE);
-    		// Change the default setting of 3 retry attempts to 5
-    		clientConfiguration.setRetryPolicy(PredefinedRetryPolicies.getDefaultRetryPolicyWithCustomMaxRetries(5));
-    		
-    		EndpointConfiguration endpointConfiguration =
-					new AwsClientBuilder.EndpointConfiguration("https://tasadora-test.s3-eu-west-1.amazonaws.com","eu-west-1");
-    		
-    		final AmazonS3 s3 = AmazonS3ClientBuilder.standard()
-    				      .withCredentials(propertiesFileCredentialsProvider)
-    				      //.withEndpointConfiguration(endpointConfiguration)
-    				      .withRegion(Regions.EU_WEST_1)
-    				      .withClientConfiguration(clientConfiguration)
-    				      .enablePathStyleAccess()
-    				      .build();
+        	AmazonS3 s3 = S3ClientConnection.S3Client("tasadora-test");
     		
     		List<PartETag> partETags = new ArrayList<PartETag>();
     		for(PartETag pTag : parETagsAlreadyUploaded) {
@@ -143,42 +114,55 @@ public class S3ResumeLowLevelSendMultiPartFile {
             boolean startListen = false;
             // Upload the file parts.
             long filePosition = startFilePosition;
-            for (int i = startSequence; filePosition < contentLength; i++) {
-            	
-            	// Because the last part could be less than partSize MB, adjust the part size as needed.
-                partSize = Math.min(partSize, (contentLength - filePosition));
-                
-            	System.out.print("Acquiring lock... " + "(" + SEMAPHORE.availablePermits());
-            	if ( SEMAPHORE.availablePermits() == 0 ) {
-            		System.out.println(") ===> All busy");
-            	} else {
-            		System.out.println(")");
-            	}
-            	SEMAPHORE.acquire();
-            	System.out.println("Got the permit!");
-            	
-                uploadRequest = new UploadRequest(bucket, key, file, s3, partSize, filePosition, i, partETags, initResponse, 
+            if ( incremental ) {
+	            for (int i = startSequence; filePosition < contentLength; i++) {
+	            	// Because the last part could be less than partSize MB, adjust the part size as needed.
+	                partSize = Math.min(partSize, (contentLength - filePosition));
+	                
+	            	System.out.print("Acquiring lock... " + "(" + SEMAPHORE.availablePermits());
+	            	if ( SEMAPHORE.availablePermits() == 0 ) {
+	            		System.out.println(") ===> All busy");
+	            	} else {
+	            		System.out.println(")");
+	            	}
+	            	SEMAPHORE.acquire();
+	            	System.out.println("Got the permit!");
+	            	
+	                uploadRequest = new UploadRequest(bucket, key, file, s3, partSize, filePosition, i, partETags, initResponse, 
+	                		this.s3UploadTracker, this.progressListener);
+	                Thread t = new Thread(uploadRequest);
+	                t.setName("***** Upload-" + i);
+	                t.setDaemon(true); 
+	                t.start();
+	                
+	                filePosition += partSize;
+	            }
+	            
+	            System.out.println("\nWaiting the remaining Threads to Finalize its job");
+	            while ( SEMAPHORE.availablePermits() < THREAD_POOL_SIZE );
+	            System.out.println("All done!");
+	            
+            } else {
+            	partSize = Math.min(partSize, (contentLength - filePosition));
+            	uploadRequest = new UploadRequest(bucket, key, file, s3, partSize, 
+            			filePosition, startSequence, partETags, initResponse, 
                 		this.s3UploadTracker, this.progressListener);
                 Thread t = new Thread(uploadRequest);
-                t.setName("***** Upload-" + i);
+                t.setName("***** Upload-0");
                 t.setDaemon(true); 
                 t.start();
-                
-                filePosition += partSize;
             }
             
-            System.out.println("\nWaiting the remaining Threads to Finalize its job");
-            while ( SEMAPHORE.availablePermits() < THREAD_POOL_SIZE );
-            System.out.println("All done!");
-            
-            // Complete the multipart upload.
-            CompleteMultipartUploadRequest compRequest = new CompleteMultipartUploadRequest(bucket, key, initResponse.getUploadId(), partETags);
-            CompleteMultipartUploadResult resultUpload = s3.completeMultipartUpload(compRequest);
-            System.out.println(resultUpload.getKey() + " uploaded!\n");
-			System.out.println(timeTracker.endTracking("Upload File S3"));
+            if (finalizeMutilPartUpload) {
+	            // Complete the multipart upload.
+	            CompleteMultipartUploadRequest compRequest = new CompleteMultipartUploadRequest(bucket, key, initResponse.getUploadId(), partETags);
+	            CompleteMultipartUploadResult resultUpload = s3.completeMultipartUpload(compRequest);
+	            System.out.println(resultUpload.getKey() + " uploaded!\n");
+				System.out.println(timeTracker.endTracking("Upload File S3"));
+            }
 			
 			this.s3UploadTracker.setFinalizedSuccessfully(true);
-			this.s3UploadTracker.printSnapShot();
+			this.s3UploadTracker.finishedSnapShot();
 			
 		} catch (AmazonServiceException e) {
 			e.printStackTrace();
@@ -225,7 +209,6 @@ public class S3ResumeLowLevelSendMultiPartFile {
 
 		@Override
 		public void run() {
-			
 			System.out.println(Thread.currentThread().getName() + "...: FilePosition:" + filePosition + ", PartSize:" + partSize);
 			
 			UploadPartRequest uploadRequest = new UploadPartRequest()
@@ -239,6 +222,9 @@ public class S3ResumeLowLevelSendMultiPartFile {
 			
 			uploadRequest.setGeneralProgressListener(this.progressListener);
 			
+			s3UploadTracker.setFilePosition(filePosition);
+			s3UploadTracker.startedSnapShot();
+			
 			// Upload the part and add the response's ETag to our list.
 			UploadPartResult uploadResult = s3.uploadPart(uploadRequest);
 			PartETag partETag = uploadResult.getPartETag();
@@ -246,7 +232,7 @@ public class S3ResumeLowLevelSendMultiPartFile {
 			
 			s3UploadTracker.addPartETag(partETag);
 			s3UploadTracker.setFilePosition(filePosition);
-			s3UploadTracker.printSnapShot();
+			s3UploadTracker.finishedSnapShot();
 			
 			StringBuffer sb = new StringBuffer();
 			sb.append("\n");

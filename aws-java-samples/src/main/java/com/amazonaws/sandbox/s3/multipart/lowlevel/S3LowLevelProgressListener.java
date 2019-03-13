@@ -19,10 +19,10 @@ public class S3LowLevelProgressListener implements ProgressListener {
 		showMessage          += (progressEvent.getBytesTransferred() / 1024); 
 		
 		if ( showMessage > 10000 ) {
-			System.out.println("==========> Total Bytes Transfered..: " + DF.format((totalBytesTransfered / 1024)) );
+			System.out.println("==> Total Bytes Transfered..: " + DF.format((totalBytesTransfered / 1024)) );
 			showMessage = 0;
 		} else
-		if ( showMessage >= 5000 ) {
+		if ( showMessage >= 6000 ) {
 			System.out.print("=");
 		}
 	}

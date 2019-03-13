@@ -15,6 +15,8 @@ import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
 
+import com.amazonaws.ClientConfiguration;
+import com.amazonaws.Protocol;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicSessionCredentials;
@@ -53,12 +55,15 @@ public class S3Sandbox {
 		//readFileAtS3("tasadora-gamma","tasadora-gamma","request/tasacion-c66b08cb-db97-4622-9eb6-57439a9022ab");
 		
 		readFileAtS3("tasadora-alpha","tasadora-alpha","request/tasacion-0833ce85-fe95-4777-8247-545324865258");
+		//System.out.println("Ok");
 	}
 	
 	@SuppressWarnings("deprecation")
 	private static AmazonS3 buildAmazonS3Client(String user) {
-		//ClientConfiguration clientCfg = new ClientConfiguration();
-	    //clientCfg.setProtocol(Protocol.HTTP);
+		
+		ClientConfiguration clientCfg = new ClientConfiguration();
+	    clientCfg.setProtocol(Protocol.HTTP);
+	    
 	    //clientCfg.setProxyHost("cache.bancsabadell.com");
 	    //clientCfg.setProxyPort(8080);
 		//clientCfg.setProtocol(Protocol.HTTPS);
@@ -66,27 +71,27 @@ public class S3Sandbox {
 		AmazonS3 s3 = null;
 		
 		try {
-			//BasicSessionCredentials temporaryToken = IAMSandbox.getTasadorasToken("tasadora-beta", "UserName", "*******");
 			BasicSessionCredentials temporaryToken = IAMSandbox.getTasadorasToken(user, "UserName", "*******");
-			
 			System.out.println("\n******* TEMPORARY SECURITY CREDENTIALS to \"" + user + "\" *******");
 			System.out.println("|");
 			System.out.println("| AccessKeyID..:" + temporaryToken.getAWSAccessKeyId());
 			System.out.println("| SecretKey....:" + temporaryToken.getAWSSecretKey());
-			System.out.println("| Token........:" + temporaryToken.getSessionToken());
-			System.out.println("|\n\n");
+			System.out.println("| --- BEGIN TOKEN ---\n" + temporaryToken.getSessionToken() + "\n| --- END TOKEN ---\n");
 			
 			
 			EndpointConfiguration endpointConfiguration =
-					new AwsClientBuilder.EndpointConfiguration("http://34.222.229.179","us-west-2");
+					//new AwsClientBuilder.EndpointConfiguration("http://34.222.229.179","us-west-2");
 					//new AwsClientBuilder.EndpointConfiguration("http://ec2-52-38-15-125.us-west-2.compute.amazonaws.com","us-west-2");
 					//new AwsClientBuilder.EndpointConfiguration("http://bancsabadells3.us-east-1.amazonaws.com","us-east-1");
-					//new AwsClientBuilder.EndpointConfiguration("http://bancsabadells3.us-west-2.amazonaws.com","us-west-2");
+					new AwsClientBuilder.EndpointConfiguration("http://bancsabadells3.us-west-2.amazonaws.com","us-west-2");
+					//new AwsClientBuilder.EndpointConfiguration("http://s3.us-west-2.amazonaws.com","us-west-2");
 			
 			s3 = AmazonS3ClientBuilder.standard()
 						   .withCredentials(new AWSStaticCredentialsProvider(temporaryToken))
 						   .withEndpointConfiguration(endpointConfiguration)
 						   .enablePathStyleAccess()
+						   .withClientConfiguration(clientCfg)
+						   //.withRegion(Regions.US_WEST_2)
 						   /*.withRequestHandlers(new RequestHandler2() {
 								@Override
 							    public void beforeRequest(Request<?> request) {
@@ -96,7 +101,7 @@ public class S3Sandbox {
 							})*/
 						   .build();
 			
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		

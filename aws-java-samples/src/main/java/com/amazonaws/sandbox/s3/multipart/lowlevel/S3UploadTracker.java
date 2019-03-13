@@ -24,20 +24,19 @@ public class S3UploadTracker {
 	private boolean finalizedSuccessfully;
 	private String pathFiles = "/Users/ualter/Temp/";
 	private String folder;
-	private int sequence;
 	private boolean setUp;
 	
 	private static DecimalFormat DF = new DecimalFormat("#00");
 	
 	public static void main(String[] args) {
-		S3UploadTracker s3UploadTracker = new S3UploadTracker("bucketName","keyName");
+		S3UploadTracker s3UploadTracker = new S3UploadTracker("bucketName","keyName","Thread");
 		s3UploadTracker.setFilePosition(12390);
 		s3UploadTracker.setPartSize(10);
 		s3UploadTracker.setUploadId("fdsjfklsjdlkfjsdl");
 		s3UploadTracker.addPartETag(new PartETag(1, "1231231432423"));
 		s3UploadTracker.addPartETag(new PartETag(2, "1231231432423"));
 		s3UploadTracker.addPartETag(new PartETag(3, "1231231432423"));
-		String fileName = s3UploadTracker.printSnapShot();
+		String fileName = s3UploadTracker.finishedSnapShot();
 		
 		S3UploadTracker s3UploadTrackerSaved = S3UploadTracker.loadMe(fileName);
 		System.out.println(s3UploadTrackerSaved.getBucketName());
@@ -47,30 +46,38 @@ public class S3UploadTracker {
 	public S3UploadTracker() {
 	}
 	
-	public S3UploadTracker(String bucketName, String key) {
+	public S3UploadTracker(String bucketName, String key, String sequenceName) {
 		super();
 		this.bucketName = bucketName;
 		this.key = key;
+		this.sequenceName = sequenceName;
 	}
 
-	public String printSnapShot() {
+	public String startedSnapShot() {
+		return printSnapShot("started");
+	}
+    public String finishedSnapShot() {
+    	return printSnapShot("finished");
+	}
+    
+	private String printSnapShot(String phase) {
 		if ( !this.setUp ) {
 			setUpS3UploadTracker();
 		}
 		
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyddmm_hhMMss");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
 		
 		String resultFileName = this.folder 
-				+ DF.format(++sequence)
-				+ "-"
-				+ this.key.replaceAll("/", "_") 
+				+ this.sequenceName
+				//+ "-"
+				//+ this.key.replaceAll("/", "_") 
 				+ "-" 
 				+ sdf.format(Calendar.getInstance().getTime());
 		
 		if ( this.isFinalizedSuccessfully() ) {
 			resultFileName += "-finalized.txt";
 		} else {
-			resultFileName += ".txt";
+			resultFileName += ("-" + phase + ".txt");
 		}
 		ObjectMapper mapper = new ObjectMapper();
 		try {
@@ -80,6 +87,8 @@ public class S3UploadTracker {
 		}
 		return resultFileName;
 	}
+	
+	
 
 	private void setUpS3UploadTracker() {
 		this.folder = pathFiles + this.key.replaceAll("/", "_") + "/";
@@ -104,6 +113,8 @@ public class S3UploadTracker {
 		partETagSaved.setTagValue(partETag.getETag());
 		this.listPartSaved.add(partETagSaved);
 	}
+	
+	
 	
 	public List<PartSaved> getListPartSaved() {
 		return listPartSaved;
