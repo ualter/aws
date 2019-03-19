@@ -18,7 +18,7 @@ public class S3UploadTracker {
 	private String key;
 	private String uploadId;
 	private String file;
-	private int    partSize;
+	private long   partSize;
 	private long   filePosition;
 	private List<PartSaved> listPartSaved = new ArrayList<PartSaved>();
 	private boolean finalizedSuccessfully;
@@ -29,14 +29,14 @@ public class S3UploadTracker {
 	private static DecimalFormat DF = new DecimalFormat("#00");
 	
 	public static void main(String[] args) {
-		S3UploadTracker s3UploadTracker = new S3UploadTracker("bucketName","keyName","Thread");
+		S3UploadTracker s3UploadTracker = new S3UploadTracker("bucketName","keyName");
 		s3UploadTracker.setFilePosition(12390);
 		s3UploadTracker.setPartSize(10);
 		s3UploadTracker.setUploadId("fdsjfklsjdlkfjsdl");
 		s3UploadTracker.addPartETag(new PartETag(1, "1231231432423"));
 		s3UploadTracker.addPartETag(new PartETag(2, "1231231432423"));
 		s3UploadTracker.addPartETag(new PartETag(3, "1231231432423"));
-		String fileName = s3UploadTracker.finishedSnapShot();
+		String fileName = s3UploadTracker.finishedSnapShot("hello");
 		
 		S3UploadTracker s3UploadTrackerSaved = S3UploadTracker.loadMe(fileName);
 		System.out.println(s3UploadTrackerSaved.getBucketName());
@@ -46,21 +46,20 @@ public class S3UploadTracker {
 	public S3UploadTracker() {
 	}
 	
-	public S3UploadTracker(String bucketName, String key, String sequenceName) {
+	public S3UploadTracker(String bucketName, String key) {
 		super();
 		this.bucketName = bucketName;
 		this.key = key;
-		this.sequenceName = sequenceName;
 	}
 
-	public String startedSnapShot() {
-		return printSnapShot("started");
+	public String startedSnapShot(String threadName) {
+		return printSnapShot("started", threadName);
 	}
-    public String finishedSnapShot() {
-    	return printSnapShot("finished");
+    public String finishedSnapShot(String threadName) {
+    	return printSnapShot("finished", threadName);
 	}
     
-	private String printSnapShot(String phase) {
+	private String printSnapShot(String phase, String threadName) {
 		if ( !this.setUp ) {
 			setUpS3UploadTracker();
 		}
@@ -68,7 +67,7 @@ public class S3UploadTracker {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
 		
 		String resultFileName = this.folder 
-				+ this.sequenceName
+				+ threadName
 				//+ "-"
 				//+ this.key.replaceAll("/", "_") 
 				+ "-" 
@@ -87,8 +86,6 @@ public class S3UploadTracker {
 		}
 		return resultFileName;
 	}
-	
-	
 
 	private void setUpS3UploadTracker() {
 		this.folder = pathFiles + this.key.replaceAll("/", "_") + "/";
@@ -174,11 +171,11 @@ public class S3UploadTracker {
 		this.file = file;
 	}
 
-	public int getPartSize() {
+	public long getPartSize() {
 		return partSize;
 	}
 
-	public void setPartSize(int partSize) {
+	public void setPartSize(long partSize) {
 		this.partSize = partSize;
 	}
 
