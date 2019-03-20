@@ -26,7 +26,8 @@ public class S3UploadTracker {
 	private String folder;
 	private boolean setUp;
 	
-	private static DecimalFormat DF = new DecimalFormat("#00");
+	private static DecimalFormat    DF  = new DecimalFormat("#00");
+	private static SimpleDateFormat SDF = new SimpleDateFormat("yyyyMMdd_HHmmss");
 	
 	public static void main(String[] args) {
 		S3UploadTracker s3UploadTracker = new S3UploadTracker("bucketName","keyName");
@@ -64,14 +65,12 @@ public class S3UploadTracker {
 			setUpS3UploadTracker();
 		}
 		
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
-		
 		String resultFileName = this.folder 
 				+ threadName
 				//+ "-"
 				//+ this.key.replaceAll("/", "_") 
 				+ "-" 
-				+ sdf.format(Calendar.getInstance().getTime());
+				+ SDF.format(Calendar.getInstance().getTime());
 		
 		if ( this.isFinalizedSuccessfully() ) {
 			resultFileName += "-finalized.txt";
@@ -88,7 +87,12 @@ public class S3UploadTracker {
 	}
 
 	private void setUpS3UploadTracker() {
-		this.folder = pathFiles + this.key.replaceAll("/", "_") + "/";
+		this.folder = 
+				pathFiles + 
+				"snapshots-" + 
+			    this.key.replaceAll("/", "_") +
+			    "-" + SDF.format(Calendar.getInstance().getTime()) +
+				"/";
 		File fDir = new File(this.folder);
 		
 		fDir.mkdir();

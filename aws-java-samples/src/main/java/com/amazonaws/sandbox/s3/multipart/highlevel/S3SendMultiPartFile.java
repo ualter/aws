@@ -56,7 +56,7 @@ public class S3SendMultiPartFile {
     		
     		ClientConfiguration clientConfiguration=new ClientConfiguration();
     		clientConfiguration.setMaxConnections(THREAD_POOL_SIZE);
-    		clientConfiguration.setProtocol(Protocol.HTTP);
+    		clientConfiguration.setProtocol(Protocol.HTTPS);
     		// Change the default setting of 3 retry attempts to 5
     		clientConfiguration.setRetryPolicy(PredefinedRetryPolicies.getDefaultRetryPolicyWithCustomMaxRetries(5));
     		

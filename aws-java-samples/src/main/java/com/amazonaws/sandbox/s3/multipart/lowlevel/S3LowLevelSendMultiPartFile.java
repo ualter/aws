@@ -33,7 +33,9 @@ public class S3LowLevelSendMultiPartFile {
 	
 	public static void main(String[] args) throws Exception {
 		//startUploadFromScracth();
-		resumeUpload();
+		//resumeUpload();
+		
+		startUploadGigaFile();
 	}
 
 	private static void startUploadFromScracth() {
@@ -41,6 +43,16 @@ public class S3LowLevelSendMultiPartFile {
 		String key      = "request/tasacion-file-multipartedUploaded.pdf";
 		String fileName = "/Users/ualter/Temp/529-2712-1-PB.pdf";
 		long   partSize = 10;
+		
+		S3LowLevelSendMultiPartFile s = new S3LowLevelSendMultiPartFile();
+		s.multipartUploadsFile(bucket, key, fileName, partSize);
+	}
+	
+	private static void startUploadGigaFile() {
+		String bucket   = "tasadoratest";
+		String key      = "fichero-giga.txt";
+		String fileName = "/Users/ualter/Temp/fichero-giga.txt";
+		long   partSize = 50;
 		
 		S3LowLevelSendMultiPartFile s = new S3LowLevelSendMultiPartFile();
 		s.multipartUploadsFile(bucket, key, fileName, partSize);
