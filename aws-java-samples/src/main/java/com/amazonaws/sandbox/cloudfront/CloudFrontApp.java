@@ -42,15 +42,13 @@ public class CloudFrontApp {
 
 	private static final String AWS_TOKEN_DIR   = ".awsToken";
 	private static final String FILE_TOKEN_NAME = "aws-service-user-access-token.properties";
+	private static final String DISTR_ID = "E35ICIHCD970XR";
 
 	public static void main(String[] args) {
-		// queryDistribution();
-		System.out.println(new CloudFrontApp().invalidateCacheDistributionCheckProgressTokenCredentials());
-		// System.out.println(new
-		// CloudFrontApp().invalidateCacheDistributionBasicCredentials());
-		// System.out.println(new
-		// CloudFrontApp().invalidateCacheDistributionCheckProgressStandardCredentials());
-
+		new CloudFrontApp().queryDistribution();
+		//System.out.println(new CloudFrontApp().invalidateCacheDistributionCheckProgressTokenCredentials());
+		// System.out.println(new CloudFrontApp().invalidateCacheDistributionBasicCredentials());
+		// System.out.println(new CloudFrontApp().invalidateCacheDistributionCheckProgressStandardCredentials());
 	}
 
 	/**
@@ -302,7 +300,7 @@ public class CloudFrontApp {
 	 */
 	@SuppressWarnings("unused")
 	private String invalidateCacheDistributionBasicCredentials() {
-		PropertiesFileCredentialsProvider awsCredentials = getUserServiceCredentials("aws-service-user");
+		PropertiesFileCredentialsProvider awsCredentials = getUserServiceCredentials("ecomm");
 		BasicAWSCredentials awsCreds = new BasicAWSCredentials(awsCredentials.getCredentials().getAWSAccessKeyId(), 
 				                                               awsCredentials.getCredentials().getAWSSecretKey());
 		AmazonCloudFront awsCloudFronClient = AmazonCloudFrontClientBuilder
@@ -329,7 +327,7 @@ public class CloudFrontApp {
 		paths.setQuantity(1);
 		invalidationBatch.setPaths(paths);
 		
-		CreateInvalidationRequest createInvalidationRequest = new CreateInvalidationRequest("E2ZCBHZCQBEB2W", invalidationBatch);
+		CreateInvalidationRequest createInvalidationRequest = new CreateInvalidationRequest(DISTR_ID, invalidationBatch);
         CreateInvalidationResult  createInvalidationResult  = awsCloudFronClient.createInvalidation(createInvalidationRequest);
         return createInvalidationResult.getInvalidation().getStatus();
 	}
@@ -338,18 +336,32 @@ public class CloudFrontApp {
 	 * Just a simple request to get info of a CloudFront Distribution 
 	 */
 	@SuppressWarnings("unused")
-	private static void queryDistribution() {
+	private void queryDistribution() {
+		
 		ClientConfiguration clientConfiguration = new ClientConfiguration();
         clientConfiguration.setProtocol(Protocol.HTTPS);
-
+        
+        PropertiesFileCredentialsProvider awsCredentials = getUserServiceCredentials("ecomm");
+		BasicAWSCredentials awsCreds = new BasicAWSCredentials(awsCredentials.getCredentials().getAWSAccessKeyId(), 
+				                                               awsCredentials.getCredentials().getAWSSecretKey());
 		AmazonCloudFront awsCloudFronClient = AmazonCloudFrontClientBuilder
-											  .standard()
-											  .withClientConfiguration(clientConfiguration)
-											  .withRegion("eu-central-1")
-											  .build();
+				                              .standard()
+				                              .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
+				                              .withRegion("eu-central-1")
+					                          .withMonitoringListener(new MonitoringListener() {
+													@Override
+													public void handleEvent(MonitoringEvent event) {
+														if (event instanceof ApiCallAttemptMonitoringEvent ) {
+															ApiCallAttemptMonitoringEvent apiCallEvent = 
+																	((ApiCallAttemptMonitoringEvent) event);
+															System.out.println("HTTP " + apiCallEvent.getHttpStatusCode());
+														}
+													}
+											   })
+				                              .build();
 
 		GetDistributionRequest getDistributionRequest = new GetDistributionRequest();
-		getDistributionRequest.setId("E2ZCBHZCQBEB2W");
+		getDistributionRequest.setId(DISTR_ID);
 		GetDistributionResult getDistributionResult = awsCloudFronClient.getDistribution(getDistributionRequest);
 		System.out.println(getDistributionResult.getDistribution().getDomainName());
 	}
