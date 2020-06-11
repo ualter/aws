@@ -3,9 +3,11 @@ package com.amazonaws.sandbox.s3.multipart.lowlevel;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -58,27 +60,14 @@ public class ArtifactoryTransferManager {
 					bucketName    = "emagin-delivery/general/artifactory/" + folder;
 					
 					try {
-						
 						if ( folder.equalsIgnoreCase("08") ) {
 							throw new RuntimeException("Deu merda!");
 						}
 						System.out.println(origin + " to " +  bucketName);
 						//copyFolderRecursively(origin, bucketName, keyPrefix);
-						
+						saveTheSuccess(currentFolder);
 					} catch (Throwable e) {
-						try {
-							String fError = "/data/dev/uaza/aws/aws-java-samples/" + currentFolder + "_Error.txt";
-							System.out.print("\033[0;33m");
-							System.out.println("Houston! For the folder " +  currentFolder + ", was thrown the error: \033[1;34m" +  e.getMessage() + "\033[0;33m, check file:" + fError);
-							System.out.print("\033[0m");
-							FileWriter fw = new FileWriter(fError);
-							fw.write(ExceptionUtils.getStackTrace(e));
-							fw.flush();
-							fw.close();
-						} catch (IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
+						saveTheError(currentFolder, e);
 					}
 				}
 				
@@ -96,6 +85,42 @@ public class ArtifactoryTransferManager {
 		System.out.println("  ArtifactoryTransferManager --folder 00");
 		System.out.println("");
 		
+	}
+	
+	private static void saveTheSuccess(String currentFolder) {
+		try {
+			String fSuccess = "/data/dev/uaza/aws/aws-java-samples/" + currentFolder + "_OK.txt";
+			System.out.print("\033[0;33m");
+			System.out.println("It is allright for the " +  currentFolder);
+			System.out.print("\033[0m");
+			FileWriter fw = new FileWriter(fSuccess);
+			
+			LocalDate today = LocalDate.now();
+			String formattedDate = today.format(DateTimeFormatter.ofPattern("dd-MMM-yyyy hh:mm:ss"));
+			fw.write("Finish copy at " + formattedDate);
+			
+			fw.flush();
+			fw.close();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	}
+
+	private static void saveTheError(String currentFolder, Throwable e) {
+		try {
+			String fError = "/data/dev/uaza/aws/aws-java-samples/" + currentFolder + "_Error.txt";
+			System.out.print("\033[1;36m");
+			System.out.println("Houston! For the folder " +  currentFolder + ", was thrown the error: \033[1;34m" +  e.getMessage() + "\033[1;36m, check file:" + fError);
+			System.out.print("\033[0m");
+			FileWriter fw = new FileWriter(fError);
+			fw.write(ExceptionUtils.getStackTrace(e));
+			fw.flush();
+			fw.close();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 
 	private static void copyFolderRecursively(String origin, String bucketName, String keyPrefix) {
