@@ -17,10 +17,30 @@ public class ArtifactoryTransferManager {
 	
 	public static void main(String[] args) {
 		
-		//String origin     = "/data/dev/uaza/.m2/";
-		String origin = "/var/ecommerce/artifactory_home/data/filestore/00";
-		String bucketName = "emagin-delivery/general/artifactory/01";
+		String originFolder = "NONE";
+		String bucketDestiny = "NONE";
+		String origin = "/var/ecommerce/artifactory_home/data/filestore/";
+		String bucketName = "emagin-delivery/general/artifactory/";
 		String keyPrefix  = "";
+		
+		if (args.length < 2) {
+			System.out.println("Please inform the arguments (in the order):");
+			System.out.println("--folder 00");
+			System.out.println(" or ...");
+			System.exit(0);
+		} else
+		if ( args[0] == "--folder" ){
+			originFolder = args[1];
+			bucketDestiny = args[1];
+			origin = "/var/ecommerce/artifactory_home/data/filestore/" + originFolder;
+			bucketName = "emagin-delivery/general/artifactory/" + bucketDestiny;
+		} else {
+			System.out.println("To avoid copy the whole thing: " origin + " to " +  bucketName);
+			System.exit(0);
+		}
+		
+		//String origin     = "/data/dev/uaza/.m2/";
+		
 		boolean recursive = true;
 		
 		AmazonS3 s3 = S3ClientConnection.S3Client("ecomm");
