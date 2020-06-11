@@ -22,7 +22,8 @@ public class S3UploadTracker {
 	private long   filePosition;
 	private List<PartSaved> listPartSaved = new ArrayList<PartSaved>();
 	private boolean finalizedSuccessfully;
-	private String pathFiles = "/Users/ualter/Temp/";
+	//private String pathFiles = "/Users/ualter/Temp/";
+	private String pathFiles = "/data/dev/uaza/s3-uploads/";
 	private String folder;
 	private boolean setUp;
 	
