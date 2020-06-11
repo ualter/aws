@@ -46,7 +46,7 @@ public class ArtifactoryTransferManager {
 		} else
 		if ( args[0].equalsIgnoreCase("--foldersfromfile") ){
 			String fileName = "/data/dev/uaza/aws/aws-java-samples/src/main/resources/"
-					+ "folders_to_copy2.txt";
+					+ "folders_to_copy.txt";
 			Stream<String> stream;
 			String currentFolder = "";
 			try {
