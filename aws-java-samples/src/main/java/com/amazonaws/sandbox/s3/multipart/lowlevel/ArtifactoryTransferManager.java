@@ -57,27 +57,30 @@ public class ArtifactoryTransferManager {
 					origin        = "/var/ecommerce/artifactory_home/data/filestore/" + folder;
 					bucketName    = "emagin-delivery/general/artifactory/" + folder;
 					
-					
-					if ( folder.equalsIgnoreCase("08") ) {
-						throw new RuntimeException("Deu merda!");
+					try {
+						
+						if ( folder.equalsIgnoreCase("08") ) {
+							throw new RuntimeException("Deu merda!");
+						}
+						System.out.println(origin + " to " +  bucketName);
+						//copyFolderRecursively(origin, bucketName, keyPrefix);
+						
+					} catch (Throwable e) {
+						try {
+							FileWriter fw = new FileWriter("/data/dev/uaza/aws/aws-java-samples/" + currentFolder + "_Error.txt");
+							fw.write(ExceptionUtils.getStackTrace(e));
+							fw.flush();
+							fw.close();
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
 					}
-					System.out.println(origin + " to " +  bucketName);
-					
-					
-					//copyFolderRecursively(origin, bucketName, keyPrefix);
 				}
 				
 			} catch (Throwable e) {
-				try {
-					FileWriter fw = new FileWriter("/data/dev/uaza/aws/aws-java-samples/" + currentFolder + "_Error.txt");
-					fw.write(ExceptionUtils.getStackTrace(e));
-					fw.flush();
-					fw.close();
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
 				System.out.println(e.getMessage());
+				e.printStackTrace();
 			}
 			
 			System.exit(0);
