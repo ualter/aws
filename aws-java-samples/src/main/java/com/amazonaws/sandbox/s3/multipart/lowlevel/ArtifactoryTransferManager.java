@@ -16,9 +16,26 @@ import java.util.Arrays;
 public class ArtifactoryTransferManager {
 	
 	public static void main(String[] args) {
+		
+		String origin = "/var/ecommerce/artifactory_home/data/filestore";
+		
+		int cur_arg = 0;
+		while (args[cur_arg].startsWith("--")) {
+            if (args[cur_arg].equals("--test")) {
+            	origin = "/var/ecommerce/artifactory_home/data/filestore"
+            } else if (args[cur_arg].equals("--artifactory")) {
+            	origin     = "/var/ecommerce/artifactory_home/data/filestore";
+            } else {
+                System.out.println("Unknown argument: " + args[cur_arg]);
+                System.out.println(USAGE);
+                System.exit(1);
+            }
+            cur_arg += 1;
+        }
+		
 		String bucketName = "emagin-delivery/general/artifactory";
 		String keyPrefix  = "";
-		String origin     = "/data/dev/uaza/.m2/";
+		//String origin     = "/data/dev/uaza/.m2/";
 		boolean recursive = true;
 		
 		AmazonS3 s3 = S3ClientConnection.S3Client("ecomm");
