@@ -21,7 +21,7 @@ public class ArtifactoryTransferManager {
 		TransferManager xfer_mgr = TransferManagerBuilder.standard().build();
 		try {
 		    MultipleFileUpload xfer = xfer_mgr.uploadDirectory(bucketName,
-		            key_prefix, new File(origin), recursive);
+		    		keyPrefix, new File(origin), recursive);
 		    // loop with Transfer.isDone()
 		    XferMgrProgress.showTransferProgress(xfer);
 		    // or block with Transfer.waitForCompletion()
