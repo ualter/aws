@@ -59,11 +59,11 @@ public class ArtifactoryTransferManager {
 					bucketName    = "emagin-delivery/general/artifactory/" + folder;
 					
 					try {
-						if ( folder.equalsIgnoreCase("08") ) {
-							throw new RuntimeException("Deu merda!");
-						}
+						//if ( folder.equalsIgnoreCase("08") ) {
+						//	throw new RuntimeException("Deu merda!");
+						//}
 						System.out.println(origin + " to " +  bucketName);
-						//copyFolderRecursively(origin, bucketName, keyPrefix);
+						copyFolderRecursively(origin, bucketName, keyPrefix);
 						saveTheSuccess(currentFolder);
 					} catch (Throwable e) {
 						saveTheError(currentFolder, e);
