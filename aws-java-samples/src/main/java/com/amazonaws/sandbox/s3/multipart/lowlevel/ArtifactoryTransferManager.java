@@ -41,10 +41,10 @@ public class ArtifactoryTransferManager {
 			
 		} else
 		if ( args[0].equalsIgnoreCase("--foldersfromfile") ){
-			String fileName = "folders_to_copy2.txt";
+			String fileName = "/data/dev/uaza/aws/aws-java-samples/src/main/resources/folders_to_copy2.txt";
 			Stream<String> stream;
 			try {
-				stream = Files.lines(Paths.get(ArtifactoryTransferManager.class.getClassLoader().getResource(fileName).toURI()));
+				stream = Files.lines(Paths.get(fileName));
 				List<String> foldersToCopy = stream.collect(Collectors.toList());
 				
 				foldersToCopy.forEach(folder -> System.out.println(folder));
