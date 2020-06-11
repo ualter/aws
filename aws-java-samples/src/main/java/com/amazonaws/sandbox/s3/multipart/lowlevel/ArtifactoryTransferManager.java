@@ -68,9 +68,9 @@ public class ArtifactoryTransferManager {
 					} catch (Throwable e) {
 						try {
 							String fError = "/data/dev/uaza/aws/aws-java-samples/" + currentFolder + "_Error.txt";
-							System.out.println("\033[0;33m");
-							System.out.println("Houston! For the folder " +  currentFolder + ", was thrown the error: " +  e.getMessage() + ", check file:" + fError);
-							System.out.println("\033[0m");
+							System.out.print("\033[0;33m");
+							System.out.println("Houston! For the folder " +  currentFolder + ", was thrown the error: \\033[1;34m" +  e.getMessage() + "\\033[0;33m, check file:" + fError);
+							System.out.print("\033[0m");
 							FileWriter fw = new FileWriter(fError);
 							fw.write(ExceptionUtils.getStackTrace(e));
 							fw.flush();
