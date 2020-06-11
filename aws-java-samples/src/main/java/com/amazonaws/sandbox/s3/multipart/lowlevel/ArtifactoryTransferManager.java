@@ -96,7 +96,7 @@ public class ArtifactoryTransferManager {
 			FileWriter fw = new FileWriter(fSuccess);
 			
 			LocalDate today = LocalDate.now();
-			String formattedDate = today.format(DateTimeFormatter.ofPattern("dd-MMM-yyyy hh:mm:ss"));
+			String formattedDate = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 			fw.write("Finish copy at " + formattedDate);
 			
 			fw.flush();
