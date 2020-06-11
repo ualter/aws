@@ -16,9 +16,11 @@ public class S3ClientConnection {
 	
 	
 	public static AmazonS3 S3Client(String user) {
-		String userFileCredentials = user + "-credentials.properties"
-		System.out.println("Getting user credentials at " + userFileCredentials);
-		File credentialsFilePath = new File(IAMSandbox.class.getClassLoader().getResource(userFileCredentials).getFile());
+		
+		String file = "/data/dev/uaza/aws/aws-java-samples/src/main/resources/ecomm-credentials.properties";
+
+		//File credentialsFilePath = new File(IAMSandbox.class.getClassLoader().getResource(userFileCredentials).getFile());
+		File credentialsFilePath = new File(file);
 		PropertiesFileCredentialsProvider propertiesFileCredentialsProvider = new PropertiesFileCredentialsProvider(credentialsFilePath.getPath());
 		
 		ClientConfiguration clientConfiguration=new ClientConfiguration();
