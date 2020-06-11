@@ -19,7 +19,7 @@ public class ArtifactoryTransferManager {
 		
 		//String origin     = "/data/dev/uaza/.m2/";
 		String origin = "/var/ecommerce/artifactory_home/data/filestore/00";
-		String bucketName = "emagin-delivery/general/artifactory/00";
+		String bucketName = "emagin-delivery/general/artifactory/01";
 		String keyPrefix  = "";
 		boolean recursive = true;
 		
