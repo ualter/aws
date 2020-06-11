@@ -24,13 +24,12 @@ public class ArtifactoryTransferManager {
 		String keyPrefix  = "";
 		
 		if (args.length < 2) {
-			System.out.println("Please inform the arguments (in the order):");
-			System.out.println("--folder 00");
-			System.out.println(" or ...");
+			System.out.println("Usage (in the order):");
+			System.out.println("  ArtifactoryTransferManager --folder 00");
 			System.exit(0);
 		} else
-		if ( args[0] == "--folder" ){
-			originFolder = args[1];
+		if ( args[0].equalsIgnoreCase("--folder") ){
+			originFolder  = args[1];
 			bucketDestiny = args[1];
 			origin = "/var/ecommerce/artifactory_home/data/filestore/" + originFolder;
 			bucketName = "emagin-delivery/general/artifactory/" + bucketDestiny;
