@@ -50,8 +50,8 @@ public class S3LowLevelSendMultiPartFile {
 	
 	private static void startUploadGigaFile() {
 		String bucket   = "emagin-delivery/general/artifactory";
-		String key      = "fichero-giga.txt";
-		String fileName = "/Users/ualter/Temp/fichero-giga.txt";
+		String key      = "artifactory.properties";
+		String fileName = "/var/ecommerce/artifactory_home/data/artifactory.properties";
 		long   partSize = 50;
 		
 		S3LowLevelSendMultiPartFile s = new S3LowLevelSendMultiPartFile();
@@ -125,7 +125,7 @@ public class S3LowLevelSendMultiPartFile {
         		progressListener.setTotalBytesTransfered(totalBytesAlreadyTransferedBefore);
         	}
         	
-        	AmazonS3 s3 = S3ClientConnection.S3Client("tasadora-test");
+        	AmazonS3 s3 = S3ClientConnection.S3Client("ecomm");
         	
         	TimeTracker timeTracker = TimeTracker.getInstance();        	
     		
