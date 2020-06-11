@@ -31,7 +31,7 @@ public class S3ClientConnection {
 		
 		return AmazonS3ClientBuilder.standard()
 				      .withCredentials(propertiesFileCredentialsProvider)
-				      .withEndpointConfiguration(endpointConfiguration)
+				      //.withEndpointConfiguration(endpointConfiguration)
 				      .withClientConfiguration(clientConfiguration)
 				      .enablePathStyleAccess()
 				      .build();
