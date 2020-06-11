@@ -17,21 +17,25 @@ public class ArtifactoryTransferManager {
 	
 	public static void main(String[] args) {
 		
-		String origin = "/var/ecommerce/artifactory_home/data/filestore";
+		String origin = "NONE";
 		
 		int cur_arg = 0;
 		while (args[cur_arg].startsWith("--")) {
             if (args[cur_arg].equals("--test")) {
-            	origin = "/var/ecommerce/artifactory_home/data/filestore"
+            	origin = "/var/ecommerce/artifactory_home/data/filestore";
             } else if (args[cur_arg].equals("--artifactory")) {
             	origin     = "/var/ecommerce/artifactory_home/data/filestore";
             } else {
                 System.out.println("Unknown argument: " + args[cur_arg]);
-                System.out.println(USAGE);
                 System.exit(1);
             }
             cur_arg += 1;
         }
+		
+		if (origin.equals("NONE")) {
+			 System.out.println("Origin=" + origin + "  INVALID!";);
+             System.exit(1)
+		}
 		
 		String bucketName = "emagin-delivery/general/artifactory";
 		String keyPrefix  = "";
