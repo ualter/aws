@@ -15,7 +15,7 @@ public class ArtifactoryTransferManager {
 	public static void main(String[] args) {
 		String bucketName = "emagin-delivery/general/artifactory";
 		String keyPrefix  = "";
-		String origin     = " /data/dev/uaza/.m2/"
+		String origin     = "/data/dev/uaza/.m2/";
 		boolean recursive = true;
 		
 		TransferManager xfer_mgr = TransferManagerBuilder.standard().build();
