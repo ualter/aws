@@ -49,7 +49,7 @@ public class S3LowLevelSendMultiPartFile {
 	}
 	
 	private static void startUploadGigaFile() {
-		String bucket   = "tasadoratest";
+		String bucket   = "emagin-delivery/general/artifactory";
 		String key      = "fichero-giga.txt";
 		String fileName = "/Users/ualter/Temp/fichero-giga.txt";
 		long   partSize = 50;

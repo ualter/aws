@@ -13,6 +13,8 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
 	</properties>
 
 	<dependencies>
@@ -62,4 +64,12 @@
 			</plugin>
 		</plugins>
 	</build>
+	
+	<distributionManagement>
+        <repository>
+            <id>emagin-proxy</id>
+            <name>eMagin Maven Proxy</name>
+            <url>http://172.30.10.208/artifactory/libs-release-local</url>
+        </repository>
+    </distributionManagement>
 </project>
