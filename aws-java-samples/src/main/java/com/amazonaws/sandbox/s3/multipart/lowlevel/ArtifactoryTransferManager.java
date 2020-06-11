@@ -33,8 +33,8 @@ public class ArtifactoryTransferManager {
         }
 		
 		if (origin.equals("NONE")) {
-			 System.out.println("Origin=" + origin + "  INVALID!";);
-             System.exit(1)
+			 System.out.println("Origin=" + origin + "  INVALID!");
+             System.exit(1);
 		}
 		
 		String bucketName = "emagin-delivery/general/artifactory";
