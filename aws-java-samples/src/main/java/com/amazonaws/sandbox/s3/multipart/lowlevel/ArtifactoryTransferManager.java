@@ -67,7 +67,7 @@ public class ArtifactoryTransferManager {
 					//copyFolderRecursively(origin, bucketName, keyPrefix);
 				}
 				
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				try {
 					FileWriter fw = new FileWriter("/data/dev/uaza/aws/aws-java-samples/" + currentFolder + "_Error.txt");
 					fw.write(ExceptionUtils.getStackTrace(e));
