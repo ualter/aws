@@ -25,9 +25,10 @@ public class ArtifactoryTransferManager {
 		String bucketName = "emagin-delivery/general/artifactory/";
 		String keyPrefix  = "";
 		
-		if (args.length < 2) {
+		if (args.length < 1) {
 			System.out.println("Usage (in the order):");
-			System.out.println("  ArtifactoryTransferManager --folder 00");
+			System.out.println("  ArtifactoryTransferManager --folder [FOLDER_NAME]");
+			System.out.println("  ArtifactoryTransferManager --foldersfromfile");
 			System.exit(0);
 		} else
 		if ( args[0].equalsIgnoreCase("--folder") ){
