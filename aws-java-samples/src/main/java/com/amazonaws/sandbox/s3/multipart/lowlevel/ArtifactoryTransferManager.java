@@ -1,17 +1,19 @@
 package com.amazonaws.sandbox.s3.multipart.lowlevel;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.transfer.MultipleFileUpload;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
-import com.amazonaws.services.s3.transfer.Upload;
-import com.amazonaws.sandbox.s3.multipart.lowlevel.S3ClientConnection;
-import com.amazonaws.services.s3.AmazonS3;
-
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class ArtifactoryTransferManager {
 	
@@ -33,22 +35,42 @@ public class ArtifactoryTransferManager {
 			bucketDestiny = args[1];
 			origin = "/var/ecommerce/artifactory_home/data/filestore/" + originFolder;
 			bucketName = "emagin-delivery/general/artifactory/" + bucketDestiny;
-		} else {
-			System.out.println("To avoid copy the whole thing: " +  origin + " to " +  bucketName);
+			
+			copyFolderRecursively(origin, bucketName, keyPrefix);
+			
+		} else
+		if ( args[0].equalsIgnoreCase("--foldersfromfile") ){
+			String fileName = "folders_to_copy2.txt";
+			Stream<String> stream;
+			try {
+				stream = Files.lines(Paths.get(ArtifactoryTransferManager.class.getClassLoader().getResource(fileName).toURI()));
+				List<String> foldersToCopy = stream.collect(Collectors.toList());
+				
+				foldersToCopy.forEach(folder -> System.out.println(folder));
+				
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+			}
+			
 			System.exit(0);
-		}
+			
+		} 
 		
-		//String origin     = "/data/dev/uaza/.m2/";
+		System.out.println("Sorry! You did not say anything, what exactly can I do for you? \n");
+		System.out.println("Usage (in the order):");
+		System.out.println("  ArtifactoryTransferManager --folder 00");
+		System.out.println("");
 		
+	}
+
+	private static void copyFolderRecursively(String origin, String bucketName, String keyPrefix) {
 		boolean recursive = true;
-		
 		AmazonS3 s3 = S3ClientConnection.S3Client("ecomm");
-		
 		TransferManager xfer_mgr = TransferManagerBuilder
 				.standard()
 				.withS3Client(s3)
 				.build();
-		
 		try {
 		    MultipleFileUpload xfer = xfer_mgr.uploadDirectory(bucketName,
 		    		keyPrefix, new File(origin), recursive);
