@@ -5,7 +5,9 @@ import com.amazonaws.services.s3.transfer.MultipleFileUpload;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.amazonaws.services.s3.transfer.Upload;
-import com.amazonaws.sandbox.s3.multipart.lowlevel.AmazonS3;
+import com.amazonaws.sandbox.s3.multipart.lowlevel.S3ClientConnection;
+import com.amazonaws.services.s3.AmazonS3;
+
 
 import java.io.File;
 import java.util.ArrayList;
