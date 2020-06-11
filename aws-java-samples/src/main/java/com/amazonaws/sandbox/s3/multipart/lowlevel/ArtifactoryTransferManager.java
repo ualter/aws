@@ -18,7 +18,10 @@ public class ArtifactoryTransferManager {
 		String origin     = "/data/dev/uaza/.m2/";
 		boolean recursive = true;
 		
-		TransferManager xfer_mgr = TransferManagerBuilder.standard().build();
+		AmazonS3 s3 = S3ClientConnection.S3Client("ecomm");
+		
+		TransferManager xfer_mgr = TransferManagerBuilder.withS3Client(s3);
+		
 		try {
 		    MultipleFileUpload xfer = xfer_mgr.uploadDirectory(bucketName,
 		    		keyPrefix, new File(origin), recursive);
