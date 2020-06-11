@@ -31,6 +31,7 @@ public class S3ClientConnection {
 		
 		return AmazonS3ClientBuilder.standard()
 				      .withCredentials(propertiesFileCredentialsProvider)
+				      .withRegion("eu-central-1")
 				      //.withEndpointConfiguration(endpointConfiguration)
 				      .withClientConfiguration(clientConfiguration)
 				      .enablePathStyleAccess()
