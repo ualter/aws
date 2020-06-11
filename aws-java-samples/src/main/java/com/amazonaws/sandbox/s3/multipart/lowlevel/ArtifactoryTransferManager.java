@@ -1,6 +1,7 @@
 package com.amazonaws.sandbox.s3.multipart.lowlevel;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -8,6 +9,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
@@ -41,17 +44,40 @@ public class ArtifactoryTransferManager {
 			
 		} else
 		if ( args[0].equalsIgnoreCase("--foldersfromfile") ){
-			String fileName = "/data/dev/uaza/aws/aws-java-samples/src/main/resources/folders_to_copy2.txt";
+			String fileName = "/data/dev/uaza/aws/aws-java-samples/src/main/resources/"
+					+ "folders_to_copy2.txt";
 			Stream<String> stream;
+			String currentFolder = "";
 			try {
 				stream = Files.lines(Paths.get(fileName));
 				List<String> foldersToCopy = stream.collect(Collectors.toList());
 				
-				foldersToCopy.forEach(folder -> System.out.println(folder));
+				for(String folder : foldersToCopy) {
+					currentFolder = folder;
+					origin        = "/var/ecommerce/artifactory_home/data/filestore/" + folder;
+					bucketName    = "emagin-delivery/general/artifactory/" + folder;
+					
+					
+					if ( folder.equalsIgnoreCase("08") ) {
+						throw new RuntimeException("Deu merda!");
+					}
+					System.out.println(origin + " to " +  bucketName);
+					
+					
+					//copyFolderRecursively(origin, bucketName, keyPrefix);
+				}
 				
 			} catch (Exception e) {
+				try {
+					FileWriter fw = new FileWriter("/data/dev/uaza/aws/aws-java-samples/" + currentFolder + "_Error.txt");
+					fw.write(ExceptionUtils.getStackTrace(e));
+					fw.flush();
+					fw.close();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				System.out.println(e.getMessage());
-				e.printStackTrace();
 			}
 			
 			System.exit(0);
