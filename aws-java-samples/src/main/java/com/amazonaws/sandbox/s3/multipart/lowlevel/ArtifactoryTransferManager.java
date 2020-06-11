@@ -89,15 +89,10 @@ public class ArtifactoryTransferManager {
 	private static void saveTheSuccess(String currentFolder) {
 		try {
 			String fSuccess = "/data/dev/uaza/aws/aws-java-samples/" + currentFolder + "_OK.txt";
-			System.out.print("\033[0;33m");
-			System.out.println("It is allright for the " +  currentFolder);
-			System.out.print("\033[0m");
 			FileWriter fw = new FileWriter(fSuccess);
-			
 			LocalDateTime today = LocalDateTime.now();
 			String formattedDate = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-			fw.write("Finish copy at " + formattedDate);
-			
+			fw.write("Finish copy at " + formattedDate + "\n");
 			fw.flush();
 			fw.close();
 		} catch (IOException e1) {
@@ -109,8 +104,8 @@ public class ArtifactoryTransferManager {
 	private static void saveTheError(String currentFolder, Throwable e) {
 		try {
 			String fError = "/data/dev/uaza/aws/aws-java-samples/" + currentFolder + "_Error.txt";
-			System.out.print("\033[1;36m");
-			System.out.println("Houston! For the folder " +  currentFolder + ", was thrown the error: \033[1;34m" +  e.getMessage() + "\033[1;36m, check file:" + fError);
+			System.out.print("\033[0;33m");
+			System.out.println("Houston! For the folder " +  currentFolder + ", was thrown the error: \033[1;34m" +  e.getMessage() + "\033[0;33m, check file:" + fError);
 			System.out.print("\033[0m");
 			FileWriter fw = new FileWriter(fError);
 			fw.write(ExceptionUtils.getStackTrace(e));
