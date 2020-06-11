@@ -35,7 +35,7 @@ public class ArtifactoryTransferManager {
 			origin = "/var/ecommerce/artifactory_home/data/filestore/" + originFolder;
 			bucketName = "emagin-delivery/general/artifactory/" + bucketDestiny;
 		} else {
-			System.out.println("To avoid copy the whole thing: " origin + " to " +  bucketName);
+			System.out.println("To avoid copy the whole thing: " +  origin + " to " +  bucketName);
 			System.exit(0);
 		}
 		
