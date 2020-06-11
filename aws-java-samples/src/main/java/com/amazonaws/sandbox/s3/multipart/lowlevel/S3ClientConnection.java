@@ -25,9 +25,6 @@ public class S3ClientConnection {
 		// Change the default setting of 3 retry attempts to 5
 		clientConfiguration.setRetryPolicy(PredefinedRetryPolicies.getDefaultRetryPolicyWithCustomMaxRetries(5));
 		
-		EndpointConfiguration endpointConfiguration =
-				new AwsClientBuilder.EndpointConfiguration("https://s3-eu-west-1.amazonaws.com","eu-west-1");
-		
 		return AmazonS3ClientBuilder.standard()
 				      .withCredentials(propertiesFileCredentialsProvider)
 				      .withEndpointConfiguration(endpointConfiguration)

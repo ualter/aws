@@ -59,7 +59,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<mainClass>com.amazonaws.samples.S3Sample</mainClass>
+					<mainClass>com.amazonaws.sandbox.s3.multipart.lowlevel.S3LowLevelSendMultiPartFile</mainClass>
 				</configuration>
 			</plugin>
 			<plugin>
