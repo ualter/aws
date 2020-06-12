@@ -72,6 +72,7 @@ public class ArtifactoryTransferManager {
 				
 			} catch (Throwable e) {
 				System.out.println(e.getMessage());
+				saveTheError(currentFolder, e);
 				e.printStackTrace();
 			}
 			
