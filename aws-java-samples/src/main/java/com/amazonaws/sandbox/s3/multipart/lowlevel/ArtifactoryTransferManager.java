@@ -25,7 +25,8 @@ public class ArtifactoryTransferManager {
 		
 		String originFolder = "NONE";
 		String bucketDestiny = "NONE";
-		String origin = "/var/ecommerce/artifactory_home/data/filestore/";
+		//String origin = "/var/ecommerce/artifactory_home/data/filestore/";
+		String origin = "/data/dev/uaza/";
 		String bucketName = "emagin-delivery/general/artifactory/";
 		String keyPrefix  = "";
 		
