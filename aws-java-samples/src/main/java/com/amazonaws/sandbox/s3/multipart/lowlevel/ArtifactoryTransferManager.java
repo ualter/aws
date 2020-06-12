@@ -58,7 +58,7 @@ public class ArtifactoryTransferManager {
 						//if ( folder.equalsIgnoreCase("08") ) {
 						//	throw new RuntimeException("Deu merda!");
 						//}
-						System.out.println(ORIGIN + " to " +  BUCKET_NAME + KEY_PREFIX);
+						System.out.println(source + " --> to --> " +  destiny);
 						copyFolderRecursively(source, destiny, KEY_PREFIX);
 						saveTheSuccess(currentFolder);
 					} catch (Throwable e) {
