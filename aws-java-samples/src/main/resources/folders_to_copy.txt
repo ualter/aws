@@ -1,1 +1,1 @@
-/data/dev/uaza/artifactory_export_compressed
+artifactory_export_compressed
