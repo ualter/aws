@@ -23,12 +23,10 @@ public class ArtifactoryTransferManager {
 	
 	public static void main(String[] args) {
 		
-		String originFolder = "NONE";
-		String bucketDestiny = "NONE";
 		//String origin = "/var/ecommerce/artifactory_home/data/filestore/";
-		String origin = "/data/dev/uaza/";
-		String bucketName = "emagin-delivery/general/artifactory/";
-		String keyPrefix  = "";
+		String ORIGIN      = "/data/dev/uaza/";
+		String BUCKET_NAME = "emagin-delivery/general/artifactory/";
+		String KEY_PREFIX  = "";
 		
 		if (args.length < 1) {
 			System.out.println("Usage (in the order):");
@@ -37,17 +35,14 @@ public class ArtifactoryTransferManager {
 			System.exit(0);
 		} else
 		if ( args[0].equalsIgnoreCase("--folder") ){
-			originFolder  = args[1];
-			bucketDestiny = args[1];
-			origin = "/var/ecommerce/artifactory_home/data/filestore/" + originFolder;
-			bucketName = "emagin-delivery/general/artifactory/" + bucketDestiny;
+			String originFolder  = args[1];
+			String bucketDestiny = args[1];
 			
-			copyFolderRecursively(origin, bucketName, keyPrefix);
+			copyFolderRecursively(ORIGIN + originFolder, BUCKET_NAME + bucketDestiny, KEY_PREFIX);
 			
 		} else
 		if ( args[0].equalsIgnoreCase("--foldersfromfile") ){
-			String fileName = "/data/dev/uaza/aws/aws-java-samples/src/main/resources/"
-					+ "folders_to_copy.txt";
+			String fileName = "/data/dev/uaza/aws/aws-java-samples/src/main/resources/folders_to_copy.txt";
 			Stream<String> stream;
 			String currentFolder = "";
 			try {
@@ -56,15 +51,15 @@ public class ArtifactoryTransferManager {
 				
 				for(String folder : foldersToCopy) {
 					currentFolder = folder;
-					origin        = "/var/ecommerce/artifactory_home/data/filestore/" + folder;
-					bucketName    = "emagin-delivery/general/artifactory/" + folder;
+					String source   = ORIGIN      + folder;
+					String destiny  = BUCKET_NAME + folder;
 					
 					try {
 						//if ( folder.equalsIgnoreCase("08") ) {
 						//	throw new RuntimeException("Deu merda!");
 						//}
-						System.out.println(origin + " to " +  bucketName);
-						copyFolderRecursively(origin, bucketName, keyPrefix);
+						System.out.println(ORIGIN + " to " +  BUCKET_NAME + KEY_PREFIX);
+						copyFolderRecursively(source, destiny, KEY_PREFIX);
 						saveTheSuccess(currentFolder);
 					} catch (Throwable e) {
 						saveTheError(currentFolder, e);
