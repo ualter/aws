@@ -32,10 +32,15 @@ public class XferMgrProgress {
     }
 
     // Prints progress while waiting for the transfer to finish.
-    public static void showTransferProgress(Transfer xfer) {
+    public static void showTransferProgress(Transfer xfer, String description) {
         // snippet-start:[s3.java1.s3_xfer_mgr_progress.poll]
         // print the transfer's human-readable description
-        System.out.println(xfer.getDescription());
+    	if ( description != null ) {
+    		System.out.println(description);
+    	} else {
+    		System.out.println(xfer.getDescription());
+    	}
+        
         // print an empty progress bar...
         printProgressBar(0.0);
         // update the progress bar while the xfer is ongoing.

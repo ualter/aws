@@ -129,7 +129,7 @@ public class ArtifactoryTransferManager {
 		    MultipleFileUpload xfer = xfer_mgr.uploadDirectory(bucketName,
 		    		keyPrefix, new File(origin), recursive);
 		    // loop with Transfer.isDone()
-		    XferMgrProgress.showTransferProgress(xfer);
+		    XferMgrProgress.showTransferProgress(xfer,"Uploading folder " + origin);
 		    // or block with Transfer.waitForCompletion()
 		    XferMgrProgress.waitForCompletion(xfer);
 		} catch (AmazonServiceException e) {
